@@ -7,7 +7,7 @@ import {
   useGetProductByIdQuery,
   useUploadProductImageMutation,
 } from "../../redux/api/productApiSlice";
-import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
+import { useFetchCategoriesQuery } from "../../redux/api/categoryApislice";
 import { toast } from "react-toastify";
 
 const indianStates = [

@@ -6,7 +6,7 @@ import {
   useCreateProductMutation,
   useUploadProductImageMutation,
 } from "../../redux/api/productApiSlice.js";
-import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
+import { useFetchCategoriesQuery } from "../../redux/api/categoryApislice";
 import AdminMenu from "./AdminMenu";
 import ContentWrapper from "../../components/ContentWrapper.jsx";
 

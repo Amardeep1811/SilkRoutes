@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetFilteredProductsQuery } from "../redux/api/productApiSlice";
-import { useFetchCategoriesQuery } from "../redux/api/categoryApiSlice";
+import { useFetchCategoriesQuery } from "../redux/api/categoryApislice";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiFilter, FiX, FiSearch, FiChevronDown, FiChevronUp } from "react-icons/fi";
 
