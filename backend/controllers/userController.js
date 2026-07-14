@@ -12,15 +12,52 @@ import crypto from "crypto";
 const createUser = asyncHandler(async (req, res) => {
   const { username, password, email } = req.body;
   if (!username || !password || !email) {
-    res.status(400);
-    throw new Error("Invalid user, Please fill all the required fields");
+    return res.status(400).json({ message: "Invalid user, Please fill all the required fields" });
   }
 
   //Check if the user already exists
   const userExists = await User.findOne({ email });
+
   if (userExists) {
-    res.status(400);
-    throw new Error("User already exists");
+    if (userExists.isVerified) {
+      return res.status(400).json({ message: "User already exists" });
+    } else {
+      // User exists but is not verified. Resend the email.
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      userExists.verificationToken = verificationToken;
+      userExists.verificationTokenExpiry = verificationTokenExpiry;
+      
+      // Optionally update password if they used a new one? We'll just update the token for now.
+      await userExists.save();
+
+      const verifyUrl = `${req.protocol}://${req.get("host")}/api/users/verify/${verificationToken}`;
+      const message = `
+        <div style="font-family: Arial, Helvetica, sans-serif; background-color: #0a0a0a; color: #E8E6E1; padding: 2rem; border-radius: 8px; text-align: center;">
+          <div style="background-color: #141414; border: 1px solid rgba(201,168,76,0.3); border-radius: 12px; padding: 2.5rem; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <h2 style="font-family: Georgia, 'Times New Roman', serif; color: #C9A84C; margin-bottom: 1rem;">Welcome to The Silk Routes!</h2>
+            <p style="font-size: 16px; margin-bottom: 1rem;">Hi ${userExists.username},</p>
+            <p style="font-size: 16px; margin-bottom: 2rem;">Please click the button below to verify your email address and complete your registration.</p>
+            <a href="${verifyUrl}" style="background-color: #C9A84C; color: #0a0a0a; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Verify Email</a>
+            <p style="font-size: 14px; margin-top: 2rem; color: #9C9690;">If you did not create an account, no further action is required.</p>
+          </div>
+        </div>
+      `;
+
+      try {
+        await sendEmail({
+          email: userExists.email,
+          subject: "Verify Your Email - The Silk Routes",
+          html: message,
+        });
+        return res.status(201).json({
+          message: "Registration successful. A verification email has been sent to your email address. Please verify to log in.",
+        });
+      } catch (error) {
+        return res.status(500).json({ message: "Unable to send verification email, please try again later." });
+      }
+    }
   }
 
   //Hash the password
@@ -42,9 +79,7 @@ const createUser = asyncHandler(async (req, res) => {
   try {
     await newUser.save();
 
-    const verifyUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/api/users/verify/${verificationToken}`;
+    const verifyUrl = `${req.protocol}://${req.get("host")}/api/users/verify/${verificationToken}`;
 
     const message = `
       <div style="font-family: Arial, Helvetica, sans-serif; background-color: #0a0a0a; color: #E8E6E1; padding: 2rem; border-radius: 8px; text-align: center;">
@@ -65,20 +100,16 @@ const createUser = asyncHandler(async (req, res) => {
         html: message,
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         message: "Registration successful. A verification email has been sent to your email address. Please verify to log in.",
       });
     } catch (error) {
-      newUser.verificationToken = undefined;
-      newUser.verificationTokenExpiry = undefined;
-      await newUser.save({ validateBeforeSave: false });
-
-      res.status(500);
-      throw new Error("There was an error sending the email. Try again later.");
+      // Rollback: delete the newly created user because email failed to send
+      await User.findByIdAndDelete(newUser._id);
+      return res.status(500).json({ message: "Unable to send verification email, please try again later." });
     }
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    return res.status(400).json({ message: error.message });
   }
 });
 
