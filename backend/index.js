@@ -2,7 +2,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -15,7 +14,6 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 
-dotenv.config();
 const port = process.env.PORT || 5000;
 
 connectDB(process.env.MONGO_URI);

@@ -1,7 +1,33 @@
-import nodemailer from "nodemailer";
-// import { Resend } from 'resend'; // Commented out — reverted to Nodemailer for now
+import sgMail from '@sendgrid/mail';
 
-const sendEmail = async (options) => {
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+
+const sendEmail = async ({ email, subject, html }) => {
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_VERIFIED_SENDER,
+    subject: subject,
+    html: html,
+  };
+  try {
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error("SENDGRID ERROR DETAILS:", error.response?.body || error);
+    throw new Error("There was an error sending the email. Try again later.");
+  }
+};
+
+export default sendEmail;
+
+/* ===========================================
+   NODEMAILER VERSION (commented out — Render free tier 
+   blocks outbound SMTP, causes ETIMEDOUT)
+   =========================================== */
+/*
+import nodemailer from "nodemailer";
+
+const sendEmailNodemailer = async (options) => {
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -28,7 +54,8 @@ const sendEmail = async (options) => {
   }
 };
 
-export default sendEmail;
+export default sendEmailNodemailer;
+*/
 
 /* ===========================================
    RESEND VERSION (commented out, for later use)
