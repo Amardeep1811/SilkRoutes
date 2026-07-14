@@ -100,7 +100,7 @@ const ProductList = () => {
               {imageUrl && (
                 <div className="text-center">
                   <img
-                    src={imageUrl}
+                    src={imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${imageUrl}`) : ""}
                     alt="product"
                     className="block max-h-[200px] w-[320px] md:w-[460px] xl:w-[98%] max-w-full object-contain object-center rounded-lg shadow-lg mb-4"
                   />

@@ -2,7 +2,10 @@ import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../constants";
 
 // Create a base query function that specifies the base URL for API requests
-const baseQuery = fetchBaseQuery({ baseUrl: BASE_URL });
+const baseQuery = fetchBaseQuery({ 
+  baseUrl: BASE_URL, 
+  credentials: "include"
+});
 
 // Create an API slice using Redux Toolkit
 export const apiSlice = createApi({

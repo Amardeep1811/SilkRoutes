@@ -164,7 +164,7 @@ const ProductUpdate = () => {
             {image && (
               <div className="text-center">
                 <img
-                  src={image}
+                  src={image ? (image.startsWith('http') ? image : `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${image}`) : ""}
                   alt="product"
                   className="block max-h-[200px] w-[320px] md:w-[460px] xl:w-[98%] max-w-full object-contain object-center rounded-lg shadow-lg mb-4"
                 />

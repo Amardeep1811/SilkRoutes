@@ -100,7 +100,7 @@ const ProductDetails = () => {
                 <div className="container flex mx-auto flex-col md:flex-row gap-8 flex-wrap w-full relative">
                   <div className="w-full md:w-1/3 overflow-hidden container flex mx-auto">
                     <img
-                      src={product?.image}
+                      src={product?.image ? (product.image.startsWith('http') ? product.image : `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${product.image}`) : ""}
                       alt={product?.name}
                       className="w-full object-cover transition-transform ease-in-out duration-500 transform hover:scale-105"
                     />

@@ -57,7 +57,7 @@ const AllProducts = () => {
                 > */}
                   <div className="flex justify-center flex-col md:flex-row">
                     <img
-                      src={product.image}
+                      src={product.image ? (product.image.startsWith('http') ? product.image : `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${product.image}`) : "/images/placeholder.jpg"}
                       alt={product.name}
                       className="w-[10rem] object-contain object-center"
                     />

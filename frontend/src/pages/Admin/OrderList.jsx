@@ -39,7 +39,7 @@ const OrderList = () => {
               <tr key={order._id}>
                 <td>
                   <img
-                    src={order.orderItems[0].image}
+                    src={order.orderItems[0].image ? (order.orderItems[0].image.startsWith('http') ? order.orderItems[0].image : `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${order.orderItems[0].image}`) : "/images/placeholder.jpg"}
                     alt={order._id}
                     className="w-[5rem] pt-4"
                   />
